@@ -1,0 +1,17 @@
+{
+  "sources": [
+    {
+      "source": "(ip)",
+      "telegram": (telegram_id)
+    },
+    {
+      "source": "(ip)",
+      "telegram": (telegram_id),
+      "email": "(почта)"
+    },
+    {
+      "source": "127.0.0.1",
+      "telegram": (telegram_id)
+    }
+  ]
+}
