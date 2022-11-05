@@ -16,6 +16,10 @@
 Чтобы микросервис обработал ваш запрос нужно отправить POST запрос с json в теле запроса, включающим ключи "code", "message" и "additional" на сайт https://notifications-telegram-bot.herokuapp.com/</br>
 </br>
 Получить все логи, вы можете по GET запросу на https://notifications-telegram-bot.herokuapp.com/logs</br>
+Так же поддерживаются параметры для фильтрации:</br>
+    1. code - int, номер кода http .</br>
+    2. time_from - float, unix время для обозначения начала промежутка времени.</br>
+    3. time_to - float, unix время для обозначения конца промежутка времени.</br>
 </br>
 <hr>
 На данный момент, к сожалению telegram bot не синхронизирован в логами на сервере, поэтому кнокпи информация в нем не достоверна
