@@ -22,12 +22,12 @@ async def main(request: Request, query: Query):
             text = f'''code: {response['code']}\nmessage: {response['message']}\nadditional: {response['additional']}'''
 
             if 'telegram' in source:
-                requests.get(f'''https://api.telegram.org/bot5694751052:AAEtzFQkGcUXX8TmIp22vRHawQhJINsfGzY/sendMessage?chat_id={source['telegram']}&text={text}''')
-            '''
+                requests.get(f'''https://api.telegram.org/bot(api ключ)/sendMessage?chat_id={source['telegram']}&text={text}''')
+
             if 'email' in source:
                 recipient = source['email']
                 await send_mail(recipient, text)
-            '''
+
             response['time'] = str(time.strftime("%d/%m/%Y, %H:%M:%S", time.gmtime(time.time())))
             response['unix'] = time.time()
             await save_logs(response, source)
@@ -52,7 +52,7 @@ async def save_logs(response, source):
 
 async def send_mail(recipient, text):
     sender = 'check.telegram.bot@gmail.com'
-    password = 'yfkb zyya fpzx atwe'
+    password = '(пароль)'
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
@@ -117,7 +117,3 @@ async def get_logs(request: Request, code: int = None, time_from: float = None, 
                     return HTTPException(status_code=400, detail='You dont have any requests')
             else:
                 return HTTPException(status_code=403, detail='Forbidden')
-
-
-if __name__ == '__main__':
-    uvicorn.run('main:app', host='0.0.0.0', port=5000)
