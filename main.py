@@ -89,15 +89,29 @@ async def send_mail(recipient, text):
         print(f'Не получилось отправить письмо {recipient}\n{ex}')
 
 @app.get('/api/logs')
-async def get_logs(request: Request, code: List[int] = Query([int(i) for i in range(100, 527)], ge=100, le=526), time_from: datetime = datetime(year=1, month=1, day=1), time_to: datetime = datetime(year=9999, month=12, day=31)):
+async def get_logs(request: Request, code: List[int] = Query([int(i) for i in range(100, 527)], ge=100, le=526), time_from: datetime = datetime(year=1, month=1, day=1), time_to: datetime = datetime(year=9999, month=12, day=31), message: List[str] = Query(None, min_length=1, max_length=100), additional: List[str] = Query(None, min_length=1, max_length=100)):
     ip = request.client.host
+    print(message, additional)
     if os.path.exists(f'logs/{ip}.json'):
         with open(f'logs/{ip}.json', 'r') as f:
             logs = json.load(f)
             result = {'logs': []}
-            for log in logs['logs']:
-                if log['code'] in code and time_from <= datetime.strptime(log['time'], '%Y-%m-%d %H:%M:%S') <= time_to:
-                    result['logs'].append(log)
+            if message and additional:
+                for log in logs['logs']:
+                    if log['code'] in code and time_from <= datetime.strptime(log['time'], '%Y-%m-%d %H:%M:%S') <= time_to and log['message'] in message and log['additional'] in additional:
+                        result['logs'].append(log)
+            elif message:
+                for log in logs['logs']:
+                    if log['code'] in code and time_from <= datetime.strptime(log['time'], '%Y-%m-%d %H:%M:%S') <= time_to and log['message'] in message:
+                        result['logs'].append(log)
+            elif additional:
+                for log in logs['logs']:
+                        if log['code'] in code and time_from <= datetime.strptime(log['time'], '%Y-%m-%d %H:%M:%S') <= time_to and log['additional'] in additional:
+                            result['logs'].append(log)
+            else:
+                for log in logs['logs']:
+                        if log['code'] in code and time_from <= datetime.strptime(log['time'], '%Y-%m-%d %H:%M:%S') <= time_to:
+                            result['logs'].append(log)
             return result
     else:
         with open('config.json', 'r') as f:
