@@ -19,7 +19,7 @@
 </br>
 Получить все логи, вы можете по GET запросу на https://telegram-bot-notification.herokuapp.com/api/logs</br>
 Так же поддерживаются параметры для фильтрации:</br>
-    1. code - list[int], номер кодов http .</br>
+    1. code - list[int], номера кодов http .</br>
     2. time_from - datetime, datetime время в формате "2022-11-06 10:14:36" для обозначения начала промежутка времени.</br>
     3. time_to - datetime, datetime в формате "2022-11-06 10:14:36" время для обозначения конца промежутка времени.</br>
 </br>
