@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request, HTTPException
 from schemas import Query
-import uvicorn
+import config
 
-import json, requests, smtplib, time, os.path, datetime
+import json, requests, smtplib, time, os.path, random, uvicorn
 
 from email.mime.text import MIMEText
 
@@ -22,11 +22,28 @@ async def main(request: Request, query: Query):
             text = f'''code: {response['code']}\nmessage: {response['message']}\nadditional: {response['additional']}'''
 
             if 'telegram' in source:
-                requests.get(f'''https://api.telegram.org/bot(api ключ)/sendMessage?chat_id={source['telegram']}&text={text}''')
+                try:
+                    requests.get(f'''https://api.telegram.org/bot{config.telegram_api_key}/sendMessage?chat_id={source['telegram']}&text={text}''')
+                except Exception as ex:
+                    print(f'''Не получилось отправить сообщение {source['telegram']}\n{ex}''')
 
             if 'email' in source:
-                recipient = source['email']
-                await send_mail(recipient, text)
+                    recipient = source['email']
+                    await send_mail(recipient, text)
+
+            if 'website' in source:
+                try:
+                    requests.post(f'''{source['website']}''', json=text)
+                except Exception as ex:
+                    print(f'''Не получилось отправить запрос на {source['website']}\n{ex}''')
+
+            if 'vk' in source:
+                try:
+                    random_int = random.randint(1, 500)
+                    random_id = str(int.from_bytes(bytes=(source['vk'] + config.vk_api_key).encode('utf-8'), byteorder='big'))[random_int: random_int + 9]
+                    requests.get(f'''https://api.vk.com/method/messages.send?domain={source['vk']}&random_id={random_id}&message={text}&access_token={config.vk_api_key}&v=5.131''').json()
+                except Exception as ex:
+                    print(f'''Не получилось отправить сообщение {source['vk']}\n{ex}''')
 
             response['time'] = str(time.strftime("%d/%m/%Y, %H:%M:%S", time.gmtime(time.time())))
             response['unix'] = time.time()
@@ -52,7 +69,7 @@ async def save_logs(response, source):
 
 async def send_mail(recipient, text):
     sender = 'check.telegram.bot@gmail.com'
-    password = '(пароль)'
+    password = f'{config.email_password}'
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
@@ -66,8 +83,7 @@ async def send_mail(recipient, text):
         print(f'Письмо успешно отправлено на {recipient}')
 
     except Exception as ex:
-        print(ex)
-        print('Не получилось отправить письмо')
+        print(f'Не получилось отправить письмо {recipient}\n{ex}')
 
 @app.get('/api/logs')
 async def get_logs(request: Request, code: int = None, time_from: float = None, time_to: float = None):
