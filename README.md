@@ -26,5 +26,11 @@
     4. message - list[str], строки, которые точно равны значениям в logs.</br>
     5. addtional - list[str], строки, которые точно равны значениям в logs.</br>
 </br>
+Еще есть панель админа с возможностью добавления, удаления и редактирования пользователей (доступна только людям в while list админов по ip):</br>
+    1. https://telegram-bot-notification.herokuapp.com/settings - основное меню.</br>
+    2. https://telegram-bot-notification.herokuapp.com/settings/add - добавление нового пользователя (формы с post запросом).</br>
+    3. https://telegram-bot-notification.herokuapp.com/settings/delete - удаление пользователя (форма с post запросом).</br>
+    4. https://telegram-bot-notification.herokuapp.com/settings/edit - редактирование пользователя (формы с post запросом).</br>
+</br>
 <hr>
 На данный момент, к сожалению telegram bot не синхронизирован в логами на сервере, поэтому кнокпи информация в нем не достоверна
