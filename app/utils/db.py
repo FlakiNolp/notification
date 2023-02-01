@@ -1,7 +1,8 @@
 import sqlite3
+from app import config
 
 
-class DataBase():
+class DataBase:
 
     def __init__(self, database):
         self.connection = sqlite3.connect(database)
@@ -26,3 +27,6 @@ class DataBase():
     async def get_user(self, source):
         with self.connection:
             return self.cursor.execute('SELECT * FROM users WHERE source = ?', (source,)).fetchall()[0]
+
+
+db = DataBase(config.dp_path)

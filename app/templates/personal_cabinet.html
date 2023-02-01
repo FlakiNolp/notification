@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный аккаунт</title>
+</head>
+<body>
+  Это твой личный аккаунт
+    <p>
+        {% for _ in user %}
+            <p>{{ _[1] }}</p>
+        {% endfor %}
+    </p>
+</body>
+</html>
