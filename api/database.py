@@ -2,7 +2,7 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy import URL
 from os import getenv
 from sqlalchemy.orm import sessionmaker
-from app.models.users import Base
+from api.models import Base
 
 # TODO Обернуть в класс
 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+</head>
+<body>
+  <form method="post" content="application/x-www-form-urlencoded" action="/token" onsubmit="send(event,this)">
+      <label>Почта</label><input id="username" type="text">
+      <label>Пароль</label><input id="password" type="password">
+      <input type="submit" value="Добавить">
+  </form>
+</body>
+<script>
+    function send(e,form) {
+        let result = "";
+        fetch(form.action, {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+            .then(res => {return res.text()})
+            .then(res_body => {console.log(res_body)})
+        e.preventDefault();
+        form.reset();
+        //save_into_localstorage(result);
+        //localStorage.setItem("authorization", )
+}
+
+    function save_into_localstorage (token){
+        console.log(token);
+    }
+</script>
+</html>

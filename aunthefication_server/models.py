@@ -1,8 +1,5 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship, Mapped, declarative_base, mapped_column
-import sqlalchemy
-from datetime import datetime
-import uuid
 
 Base = declarative_base()
 

@@ -1,13 +1,9 @@
 from sqlalchemy.orm import Session
-from app.models.users import User, Notification
+from aunthefication_server.models import User, Notification
 
 
 def get_user_by_email(email: str, db: Session):
     return db.query(User).where(User.email == email).one()
-
-
-def get_users(db: Session):
-    return db.query(User).join(Notification.user)
 
 
 def new_user(db: Session):

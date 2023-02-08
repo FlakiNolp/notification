@@ -5,11 +5,21 @@
     <title>Личный аккаунт</title>
 </head>
 <body>
-  Это твой личный аккаунт
-    <p>
-        {% for _ in user %}
-            <p>{{ _[1] }}</p>
-        {% endfor %}
-    </p>
+Это твой личный аккаунт
+<data id="token" value="{{ user.access_token }}"></data>
 </body>
+<script>
+    var token = document.getElementById("token").value;
+    console.log(token);
+    localStorage.setItem("authorization", token);
+
+    const myHeaders = new Headers();
+
+    //myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('authorization'));
+    //fetch(
+    //'http://127.0.0.1:8000/users/me', {
+    //  method: 'POST',
+    //  headers: myHeaders,
+    //}).then((resp) => console.log(resp));
+</script>
 </html>
