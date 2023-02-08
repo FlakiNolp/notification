@@ -29,4 +29,4 @@ class DataBase:
             return self.cursor.execute('SELECT * FROM users WHERE source = ?', (source,)).fetchall()[0]
 
 
-db = DataBase(config.dp_path)
+#db = DataBase(config.dp_path)

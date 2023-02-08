@@ -9,12 +9,13 @@ from typing import List
 from fastapi import Request, HTTPException, Query, APIRouter, BackgroundTasks
 
 from app import config
-from app.utils.db import db
+#from app.utils.db import db
 from app.schemas.api import QueryModel
 from app.utils.api import save_logs, send_mail
 
 router = APIRouter()
 
+db = "ok"
 
 @router.post("/api")
 async def post_log(request: Request, query: QueryModel, api_key: str = Query(...)):
