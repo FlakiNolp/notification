@@ -3,6 +3,7 @@ import uvicorn
 from app.routers import api, account
 
 
+
 app = FastAPI()
 app.include_router(api.router)
 app.include_router(account.router)
