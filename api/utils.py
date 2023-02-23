@@ -42,7 +42,7 @@ async def send_mail(recipient, text):
 
     try:
         server.login(sender, password)
-        msg = MIMEText(f'{text}')
+        msg = MIMEText(f'Это автоматически сгенерированное письмо-уведомление\n{text}')
         msg['Subject'] = 'Error notification'
         server.sendmail(sender, recipient, msg.as_string())
 
@@ -65,7 +65,9 @@ async def send_vk(recipient, text):
         random_id = str(
             int.from_bytes(bytes=(recipient + config.vk_api_key).encode('utf-8'), byteorder='big'))[
                     random_int: random_int + 9]
-        requests.get(f'''https://api.vk.com/method/messages.send?domain={recipient}&random_id={random_id}&message={text}&access_token={config.vk_api_key}&v=5.131''')
+        print(recipient, random_id)
+        response = requests.get(f'''https://api.vk.com/method/messages.send?domain={recipient}&random_id={random_id}&message={text}&access_token={config.vk_api_key}&v=5.131''')
+        print(response.status_code)
     except Exception as ex:
         print(f'''Не получилось отправить сообщение {recipient}\n{ex}''')
 

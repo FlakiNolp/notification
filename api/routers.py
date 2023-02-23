@@ -19,21 +19,21 @@ router = APIRouter()
 
 
 @router.post("/api")
-async def post_log(query: QueryModel, token: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-    user = get_user_by_api_token(api_token=token, db=db)
+async def post_log(query: QueryModel, api_token: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    user = get_user_by_api_token(api_token=api_token, db=db)
     response = query.dict()
     background_tasks.add_task(notifications, user, response)
     return Response(status_code=status.HTTP_200_OK)
 
 
 @router.get('/api/logs')
-async def get_logs(token: str, db: Session = Depends(get_db),
+async def get_logs(api_token: str, db: Session = Depends(get_db),
                    code: List[int] = Query([int(i) for i in range(100, 527)], ge=100, le=526),
                    time_from: datetime = datetime(year=1, month=1, day=1),
                    time_to: datetime = datetime(year=9999, month=12, day=31),
                    message: List[str] = Query(None, min_length=1, max_length=100),
                    additional: List[str] = Query(None, min_length=1, max_length=100)):
-    user = get_user_by_api_token(api_token=token, db=db)
+    user = get_user_by_api_token(api_token=api_token, db=db)
     hash_filename = get_hash_api_token(user.api_token)
     if os.path.exists(f'{config.logs_path}/{hash_filename}.json'):
         with open(f'{config.logs_path}/{hash_filename}.json', 'r') as f:
@@ -60,3 +60,4 @@ async def get_logs(token: str, db: Session = Depends(get_db),
             return result
     else:
         return HTTPException(status_code=400, detail='You dont have any requests')
+

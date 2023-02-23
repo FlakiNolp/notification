@@ -14,4 +14,4 @@ async def startup():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="192.168.1.70", port=1001)
+    uvicorn.run(app, host="127.0.0.1", port=1001)

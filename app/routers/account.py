@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, Request, Form
-from app.utils.aunth import decode_token
+from fastapi import APIRouter, Depends, Request, Header, BackgroundTasks, Query
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import RedirectResponse
+from app.utils.aunth import decode_access_token, decode_email_token
 from app.config import templates
-import app.utils.users as users_utils
 from sqlalchemy.orm import Session
 from app.models.database import get_db
-import requests
+from app.utils.db_utils import get_user_by_id, check_email, new_user
+from app.utils.utils import send_token_email, get_hash
 
 
 router = APIRouter()
@@ -20,29 +22,29 @@ async def sign_up(request: Request):
     return templates.TemplateResponse("sign-up.html", context={"request": request})
 
 
-@router.get("/my")
-async def my_page(request: Request, current_user: str = Depends(decode_token)):
-    return templates.TemplateResponse("personal_cabinet.html", context={"request": request, "user": current_user})
+@router.post("/sign-up")
+async def sign_up(background_tasks: BackgroundTasks, request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    if check_email(form_data.username, db):
+        background_tasks.add_task(send_token_email, email=form_data.username, password=get_hash(form_data.password))
+        return templates.TemplateResponse("sign-up.html", context={"request": request})
 
 
-#@router.post("/my")
-#async def my_page(request: Request, current_user: Token = Depends(login_for_access_token)):
-#    return templates.TemplateResponse("personal_cabinet.html", context={"request": request, "user": current_user}, headers={"Authorization": f'''Bearer {current_user["access_token"]}'''})
-#
-#
-#@router.get("/users/me/items/")
-#async def read_own_items(current_user: User = Depends(get_current_user)):
-#    return [{"item_id": "Foo", "owner": current_user.email}]
+@router.get("/me")
+async def my_page(request: Request):
+    return templates.TemplateResponse("personal_cabinet.html", context={"request": request})
 
 
-@router.get("/test")
-async def test(db: Session = Depends(get_db)):
-    info = users_utils.get_users(db)
-    info = dict(info)
-    return info
+@router.post("/me")
+async def my_page(Authorization: str = Header(), db: Session = Depends(get_db)):
+    id = decode_access_token(Authorization[7:])
+    user = get_user_by_id(id, db)
+    return user
 
 
-@router.get("/new_user")
-async def test(db: Session = Depends(get_db)):
-    info = users_utils.new_user(db)
-    return info
+@router.get("/registration")
+async def registration(email_token: str = Query(), db: Session = Depends(get_db)):
+    data = decode_email_token(email_token)
+    new_user(data[0], data[1], db)
+    return RedirectResponse("http://127.0.0.1:1002/log-in")
+
+

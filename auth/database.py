@@ -2,15 +2,14 @@ from sqlalchemy.engine import create_engine
 from sqlalchemy import URL
 from os import getenv
 from sqlalchemy.orm import sessionmaker
-from app.models.users import Base
+from auth.models import Base
 
 # TODO Обернуть в класс
 
 db_user = getenv("DB_USER", "postgres")
 db_password = getenv("DB_PASSWORD")
 db_host = getenv("DB_HOST", "localhost")
-db_port = getenv("DB_PORT", 49154)
-db_password = "postgrespw"
+db_port = getenv("DB_PORT", 10000)
 
 url = URL.create(drivername="postgresql+psycopg2", username=db_user, password=db_password, host=db_host, port=db_port,
                  database="users")

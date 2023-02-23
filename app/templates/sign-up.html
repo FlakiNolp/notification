@@ -5,18 +5,20 @@
     <title>Регистрация</title>
 </head>
 <body>
-  <form method="post" content="application/x-www-form-urlencoded" onsubmit="check_email(event, this)">
-      <label>Почта</label><input id="username" type="text">
+  <form method="post" content="application/x-www-form-urlencoded" onsubmit="send(event, this)">
+      <label>Почта</label><input id="username" type="email">
       <label>Пароль</label><input id="password" type="password">
       <input type="submit" value="Регистрация">
   </form>
+  <p id="status"></p>
 </body>
 <script>
-    function check_email(e,form) {
-        let result = "";
-        fetch('/sign-up', {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-            .then(res => {return res.text()})
-            .then(res_body => {console.log(res_body)});
+    function send(e,form) {
+        fetch("http://127.0.0.1:1002/sign-up", {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+            .then((response) => {if (response.ok)
+                return document.getElementById("status").textContent = "Письмо отправлено на почту";
+            throw new Error("Такой аккаунт уже существует")})
+            .catch((error) => {document.getElementById("status").textContent = error})
         e.preventDefault();
         form.reset();
 }

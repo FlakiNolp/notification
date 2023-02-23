@@ -5,21 +5,43 @@
     <title>Личный аккаунт</title>
 </head>
 <body>
-Это твой личный аккаунт
-<data id="token" value="{{ user.access_token }}"></data>
+<p id="text"></p>
 </body>
 <script>
-    var token = document.getElementById("token").value;
-    console.log(token);
-    localStorage.setItem("authorization", token);
-
-    const myHeaders = new Headers();
-
-    //myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('authorization'));
-    //fetch(
-    //'http://127.0.0.1:8000/users/me', {
-    //  method: 'POST',
-    //  headers: myHeaders,
-    //}).then((resp) => console.log(resp));
+    async function main() {
+        let myHeaders = new Headers();
+        myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
+        let response = await fetch(
+        'http://127.0.0.1:1002/me', {
+          method: 'POST',
+          headers: myHeaders,
+        });
+        console.log(response);
+        if (response.status !== 401){
+            let data = await response.json();
+            document.getElementById("text").textContent = data['api_token'] + "\n" + data.email;
+            console.log(data);
+        }else{
+            response = await fetch(
+                'http://127.0.0.1:1000/refresh', {
+                method: 'POST',
+                headers: {'Cookie': document.cookie,
+                          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                }
+            });
+            console.log(response.headers);
+            if (response.status !== 401){
+                let data = await response.json();
+                localStorage.setItem("access_token", data.access_token);
+                document.cookie = `refresh_token=${data.refresh_token}; SameSite: Strict; max-age=2592000`;
+                window.location.href = "http://127.0.0.1:1002/me";
+            }
+            else{
+               window.location.href = "http://127.0.0.1:1002/log-in";
+                alert("Вы не авторизовались!");
+            }
+        }
+    }
+    main();
 </script>
 </html>

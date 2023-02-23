@@ -2,29 +2,31 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Регистрация</title>
+    <title>Вход</title>
 </head>
 <body>
-  <form method="post" content="application/x-www-form-urlencoded" action="/token" onsubmit="send(event,this)">
-      <label>Почта</label><input id="username" type="text">
+  <form method="post" content="application/x-www-form-urlencoded" onsubmit="send(event,this)">
+      <label>Почта</label><input id="username" type="email">
       <label>Пароль</label><input id="password" type="password">
-      <input type="submit" value="Добавить">
+      <input type="submit" value="Войти">
   </form>
 </body>
 <script>
     function send(e,form) {
-        let result = "";
-        fetch(form.action, {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-            .then(res => {return res.text()})
-            .then(res_body => {console.log(res_body)})
+        fetch("http://127.0.0.1:1000/token", {method:'post',
+            body: new URLSearchParams({'username': document.getElementById('username').value,
+                'password': document.getElementById('password').value}),
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+            .then(res => res.json())
+            .then(res_body => save_into_storages(res_body));
         e.preventDefault();
         form.reset();
-        //save_into_localstorage(result);
-        //localStorage.setItem("authorization", )
 }
 
-    function save_into_localstorage (token){
-        console.log(token);
+    let save_into_storages = (data) => {
+        document.cookie = `refresh_token=${data.refresh_token}; SameSite: Strict; max-age=2592000`
+        localStorage.setItem("access_token", data.access_token);
+        window.location.href = "/me";
     }
 </script>
 </html>
