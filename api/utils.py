@@ -8,10 +8,11 @@ import random
 import time
 from datetime import datetime
 import requests
+import os
 
 
-def get_hash_api_token(api_token: str):
-    return hashlib.sha256(api_token.encode()).hexdigest()
+def get_hash_email(email: str):
+    return hashlib.sha256(email.encode()).hexdigest()
 
 
 async def save_logs(response, source):
@@ -20,16 +21,15 @@ async def save_logs(response, source):
         datetime(year=time_now.tm_year, month=time_now.tm_mon, day=time_now.tm_mday, hour=time_now.tm_hour,
                  minute=time_now.tm_min, second=time_now.tm_sec, microsecond=int(time.time() % 1 * 1000000)))
     try:
-        with open(f'''{config.logs_path}/{source}.json''', 'r') as f:
+        with open(f'''logs/{source}.json''', 'r') as f:
             logs_dict = json.load(f)
             logs_list = logs_dict['logs']
             logs_list.append(response)
-            logs_dict = logs_dict
-        with open(f'''{config.logs_path}/{source}.json''', 'w+') as f:
+        with open(f'''logs/{source}.json''', 'w+') as f:
             json.dump(logs_dict, f, ensure_ascii=False)
     except:
         logs_dict = {'logs': [response]}
-        with open(f'''{config.logs_path}/{source}.json''', 'a+') as f:
+        with open(f'''logs/{source}.json''', 'x') as f:
             json.dump(logs_dict, f, ensure_ascii=False)
 
 
@@ -82,7 +82,7 @@ async def send_website(recipient: str, text: str):
 async def notifications(user, response: dict):
     text = f'''code: {response['code']}\nmessage: {response['message']}\nadditional: {response['additional']}'''
     async with asyncio.TaskGroup() as tg:
-        task1 = tg.create_task(save_logs(response=response, source=get_hash_api_token(user.api_token)))
+        task1 = tg.create_task(save_logs(response=response, source=get_hash_email(user.email)))
         if user.services.email is not None:
             task2 = tg.create_task(send_mail(recipient=user.services.email, text=text))
         if user.services.telegram_id is not None:

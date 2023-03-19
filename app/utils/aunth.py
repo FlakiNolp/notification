@@ -4,7 +4,7 @@ from app.config import secret_key
 from datetime import datetime, timedelta
 
 
-def create_email_token(data: dict, expires_delta: timedelta):
+def create_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
@@ -27,7 +27,7 @@ def decode_access_token(token: str):
         )
 
 
-def decode_email_token(token: str):
+def decode_registration_token(token: str):
     try:
         payload = jwt.decode(token, secret_key, algorithms="HS256")
         email: str = payload.get(f"email")

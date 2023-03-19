@@ -7,16 +7,68 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: users
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
     ports:
-      - "10000:5432"
+      - "6543:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "users", "-U", "postgres" ]
+      timeout: 40s
+      interval: 2s
+      retries: 20
 
   auth:
-    build: /authd
+    depends_on:
+      db:
+        condition: service_healthy
+    build: auth
+    environment:
+      PYTHONPATH: /usr/src
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PORT: 5432
+      SECRET_KEY: "${SECRET_KEY}"
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 15
+      ACCESS_TOKEN_EXPIRE_HOURSE: 720
+    ports:
+      - "1000:1000"
 
   api:
-    build: /api
+    depends_on:
+      db:
+        condition: service_healthy
+    build: api
+    environment:
+      PYTHONPATH: /usr/src
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PORT: 5432
+      EMAIL_PASSWORD: "${EMAIL_PASSWORD}"
+      TELEGRAM_API_KEY: "${TELEGRAM_API_KEY}"
+      VK_API_KEY: "${VK_API_KEY}"
+      LOGS_PATH: /usr/src/api/logs
+    ports:
+      - "1001:1001"
+    volumes:
+      - ./logs:/usr/src/api/logs
 
   app:
-    build: /app
+    depends_on:
+      db:
+        condition: service_healthy
+    build: app
+    environment:
+      PYTHONPATH: /usr/src
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PORT: 5432
+      SECRET_KEY: "${SECRET_KEY}"
+      EMAIL_PASSWORD: "${EMAIL_PASSWORD}"
+    ports:
+      - "1002:1002"
 
+volumes:
+  api_logs: null

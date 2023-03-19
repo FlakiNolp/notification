@@ -6,7 +6,7 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = "user"
-    __table_args__ = {"schema": "users"}
+    __table_args__ = {"schema": "public"}
     id: Mapped[int] = mapped_column(primary_key=True, unique=True, comment="Уникальный идентификатор пользователя")
     email: Mapped[str] = mapped_column(unique=True, comment="Почта, по которой пользователь регистрировался")
     hashed_password: Mapped[str] = mapped_column(comment="Хеш пароля от аккаунта")
@@ -17,7 +17,7 @@ class User(Base):
 
 class Notification(Base):
     __tablename__ = "notification"
-    __table_args__ = {"schema": "users"}
+    __table_args__ = {"schema": "public"}
     user_id: Mapped[str] = mapped_column(ForeignKey(User.id), primary_key=True, unique=True)
     email: Mapped[str] = mapped_column(nullable=True)
     telegram_id: Mapped[int] = mapped_column(nullable=True)

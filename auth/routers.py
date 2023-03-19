@@ -34,18 +34,18 @@ def create_access_token(data: dict, expires_delta: timedelta):
 
 
 # Create refresh token
-def create_refresh_token(data: dict, expires_delta: timedelta, access_token: str = None):
+def create_refresh_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm, access_token=access_token)
+    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
     return encoded_jwt
 
 
 # Decode token
 def decode_token(token: str = Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(token[7:], secret_key, algorithms=[algorithm])
+        payload = jwt.decode(token[7:], secret_key, algorithms=algorithm)
         id: int = payload.get("id")
         if id is None:
             raise JWTError
@@ -58,9 +58,9 @@ def decode_token(token: str = Depends(oauth2_scheme)):
         )
 
 
-def decode_refresh_token(token: str, access_token: str):
+def decode_refresh_token(token: str):
     try:
-        payload = jwt.decode(token, secret_key, algorithms=[algorithm], access_token=access_token)
+        payload = jwt.decode(token, secret_key, algorithms=algorithm)
         id: int = payload.get("id")
         if id is None:
             raise JWTError
@@ -90,24 +90,22 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"id": user.id}, expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(
-        data={"id": user.id}, expires_delta=refresh_token_expires, access_token=access_token
+        data={"id": user.id}, expires_delta=refresh_token_expires
     )
-    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"},
-                        headers={"Access-Control-Allow-Origin": "http://127.0.0.1:1002"})
+    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
 
 
 # Create refresh token endpoint
 @router.post("/refresh")
-async def refresh_token_fun(Authorization: str = Header(), refresh_token: str = Cookie()):
-    id = decode_refresh_token(refresh_token, Authorization[7:])
+async def refresh_token_fun(refresh_token: str = Cookie()):
+    id = decode_refresh_token(refresh_token)
     access_token_expires = timedelta(minutes=access_token_expire_minutes)
     refresh_token_expires = timedelta(hours=refresh_token_expire_hours)
     access_token = create_access_token(
         data={"id": id}, expires_delta=access_token_expires
     )
     refresh_token = create_refresh_token(
-        data={"id": id}, expires_delta=refresh_token_expires, access_token=Authorization[7:]
+        data={"id": id}, expires_delta=refresh_token_expires
     )
-    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"},
-                        headers={"Access-Control-Allow-Origin": "http://127.0.0.1:1002"})
+    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
 
