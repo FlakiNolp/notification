@@ -8,7 +8,6 @@ import random
 import time
 from datetime import datetime
 import requests
-import os
 
 
 def get_hash_email(email: str):

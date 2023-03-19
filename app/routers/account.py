@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request, Header, BackgroundTasks, Query,
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse, Response, JSONResponse
 from app.utils.aunth import decode_access_token, decode_registration_token
-from app.config import templates
+from app.config import templates, host
 from sqlalchemy.orm import Session
 from app.models.database import get_db
 import app.utils.db_utils as db_utils
@@ -26,12 +26,12 @@ async def sign_up(background_tasks: BackgroundTasks, request: Request, form_data
                   db: Session = Depends(get_db)):
     if db_utils.check_email(form_data.username, db):
         background_tasks.add_task(send_token_email, email=form_data.username, password=get_hash(form_data.password))
-        return templates.TemplateResponse("sign-up.html", context={"request": request})
+        return templates.TemplateResponse("sign-up.html", context={"request": request, "host": host})
 
 
 @router.get("/me")
 async def my_page(request: Request):
-    return templates.TemplateResponse("personal_cabinet.html", context={"request": request})
+    return templates.TemplateResponse("personal_cabinet.html", context={"request": request, "host": host})
 
 
 @router.post("/me")
@@ -47,7 +47,7 @@ async def registration(token: str = Query(),
                        db: Session = Depends(get_db)):
     data = decode_registration_token(token)
     db_utils.new_user(data[0], data[1], db)
-    return RedirectResponse("http://localhost:1002/log-in")
+    return RedirectResponse(f"http://{host}:1002/log-in")
 
 
 @router.post("/me/services")
@@ -85,7 +85,7 @@ async def update_password(background_tasks: BackgroundTasks,
 async def new_password(request: Request,
                        token: str = Query()):
     decode_access_token(token)
-    return templates.TemplateResponse("reset_password", context={"request": request})
+    return templates.TemplateResponse("reset_password", context={"request": request, "host": host})
 
 
 @router.post("/reset-password")

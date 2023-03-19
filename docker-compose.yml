@@ -63,7 +63,7 @@ services:
       PYTHONPATH: /usr/src
       DB_HOST: db
       DB_USER: postgres
-      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_PASSWORD: ${DB_PASSWORD}
       DB_PORT: 5432
       SECRET_KEY: "${SECRET_KEY}"
       EMAIL_PASSWORD: "${EMAIL_PASSWORD}"

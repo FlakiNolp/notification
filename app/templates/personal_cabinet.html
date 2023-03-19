@@ -25,7 +25,7 @@
         let myHeaders = new Headers();
         myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
         let response = await fetch(
-        'http://localhost:1002/me', {
+        'http://{{ host }}:1002/me', {
           method: 'POST',
           headers: myHeaders,
         });
@@ -39,7 +39,7 @@
         }else{
             console.log(document.cookie);
             response = await fetch(
-                'http://localhost:1000/refresh', {
+                'http://{{ host }}:1000/refresh', {
                 method: 'POST',
                 headers: {
                     'cookie': document.cookie
@@ -50,11 +50,11 @@
                 let data = await response.json();
                 localStorage.setItem("access_token", data.access_token);
                 document.cookie = `refresh_token=${data.refresh_token}; SameSite: Strict; max-age=2592000`;
-                window.location.href = 'http://localhost:1002/me';
+                window.location.href = 'http://{{ host }}:1002/me';
             }
             else{
                alert("Вы не авторизовались!");
-               location.href = "http://localhost:1002/log-in";
+               location.href = "http://{{ host }}:1002/log-in";
             }
         }
     }

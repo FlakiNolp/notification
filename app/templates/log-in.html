@@ -20,7 +20,7 @@
     }
 
     async function send() {
-        let result = await fetch("http://localhost:1000/token", {method:'post',
+        let result = await fetch("http://{{ host }}:1000/token", {method:'post',
             body: new URLSearchParams({'username': document.getElementById('username').value,
                 'password': document.getElementById('password').value}),
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
