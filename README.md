@@ -1,12 +1,12 @@
 <h1>Микросервис на FAST API, для логгировани и оповещения событий</h1>
 
-<h2Схема БД</h2>
-Таблица user:</br>
-    1. id
-    2. email
-    3. hashed_password
-    4. api_token
-Таблица user:</br>
+<h2>Схема БД</h2>
+<h3>Таблица user:</h3>
+    1. id.</br>
+    2. email.</br>
+    3. hashed_password.</br>
+    4. api_token.</br>
+<h3>Таблица notification:</h3>
     1. user_id - внешний ключ user.id.</br>
     2. telegram - telegram_id, на который будут отправляться оповещения.</br>
     3. email - почта, на которую будут отправляться оповещения.</br>
