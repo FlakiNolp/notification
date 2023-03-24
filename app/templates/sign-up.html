@@ -14,7 +14,7 @@
 </body>
 <script>
     function send(e,form) {
-        fetch("http://{{ host }}:1002/sign-up", {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+        fetch('http://{{ host }}:1002/sign-up', {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
             .then((response) => {if (response.ok)
                 return document.getElementById("status").textContent = "Письмо отправлено на почту";
             throw new Error("Такой аккаунт уже существует")})

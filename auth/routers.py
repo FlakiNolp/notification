@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status, APIRouter, Header, Cookie
+from fastapi import Depends, HTTPException, status, APIRouter, Cookie
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from auth.database import get_db
 from sqlalchemy.orm import Session
 import auth.utils as users_utils
-from auth.config import secret_key, algorithm, access_token_expire_minutes, refresh_token_expire_hours
+from auth.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_HOURS
 import hashlib
 
 router = APIRouter()
@@ -29,7 +29,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
@@ -38,14 +38,14 @@ def create_refresh_token(data: dict, expires_delta: timedelta):
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, secret_key, algorithm=algorithm)
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 # Decode token
 def decode_token(token: str = Depends(oauth2_scheme)):
     try:
-        payload = jwt.decode(token[7:], secret_key, algorithms=algorithm)
+        payload = jwt.decode(token[7:], SECRET_KEY, algorithms=ALGORITHM)
         id: int = payload.get("id")
         if id is None:
             raise JWTError
@@ -60,7 +60,7 @@ def decode_token(token: str = Depends(oauth2_scheme)):
 
 def decode_refresh_token(token: str):
     try:
-        payload = jwt.decode(token, secret_key, algorithms=algorithm)
+        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         id: int = payload.get("id")
         if id is None:
             raise JWTError
@@ -84,8 +84,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token_expires = timedelta(minutes=access_token_expire_minutes)
-    refresh_token_expires = timedelta(hours=refresh_token_expire_hours)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS)
     access_token = create_access_token(
         data={"id": user.id}, expires_delta=access_token_expires
     )
@@ -99,8 +99,8 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @router.post("/refresh")
 async def refresh_token_fun(refresh_token: str = Cookie()):
     id = decode_refresh_token(refresh_token)
-    access_token_expires = timedelta(minutes=access_token_expire_minutes)
-    refresh_token_expires = timedelta(hours=refresh_token_expire_hours)
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expires = timedelta(hours=REFRESH_TOKEN_EXPIRE_HOURS)
     access_token = create_access_token(
         data={"id": id}, expires_delta=access_token_expires
     )

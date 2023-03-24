@@ -10,16 +10,10 @@ services:
       POSTGRES_PASSWORD: "${DB_PASSWORD}"
     ports:
       - "6543:5432"
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-q", "users", "-U", "postgres" ]
-      timeout: 40s
-      interval: 2s
-      retries: 20
 
   auth:
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     build: auth
     environment:
       PYTHONPATH: /usr/src
@@ -36,8 +30,7 @@ services:
 
   api:
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     build: api
     environment:
       PYTHONPATH: /usr/src
@@ -56,10 +49,10 @@ services:
 
   app:
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     build: app
     environment:
+      HOST_DOMAIN: "${HOST_DOMAIN}"
       PYTHONPATH: /usr/src
       DB_HOST: db
       DB_USER: postgres
@@ -71,4 +64,4 @@ services:
       - "1002:1002"
 
 volumes:
-  api_logs: null
+  api_logs:

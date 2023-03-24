@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.0.0-beta1" use-changelog="false" last-position="0,0" last-zoom="1" max-obj-count="4"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<role name="pg_database_owner"
+ inherit="true"
+ password="********"
+ sql-disabled="true">
+</role>
+
+<database name="users" encoding="UTF8" lc-collate="en_US.utf8" lc-ctype="en_US.utf8" is-template="false" allow-conns="true">
+	<role name="postgres"/>
+	<tablespace name="pg_default"/>
+</database>
+
+<schema name="public" layers="0" rect-visible="true" fill-color="#e1e1e1" sql-disabled="true">
+</schema>
+
+<sequence name="user_id_seq" cycle="false" start="1" increment="1" min-value="1" max-value="2147483647" cache="1">
+	<schema name="public"/>
+	<role name="postgres"/>
+</sequence>
+
+<table name="user" layers="0" collapse-mode="2" max-obj-count="4" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="60" y="60"/>
+	<column name="id" not-null="true" sequence="public.user_id_seq">
+		<type name="integer" length="0"/>
+		<comment> <![CDATA[Уникальный идентификатор пользователя]]> </comment>
+	</column>
+	<column name="email" not-null="true">
+		<type name="character varying" length="0"/>
+		<comment> <![CDATA[Почта, по которой пользователь регистрировался]]> </comment>
+	</column>
+	<column name="hashed_password" not-null="true">
+		<type name="character varying" length="0"/>
+		<comment> <![CDATA[Хеш пароля от аккаунта]]> </comment>
+	</column>
+	<column name="api_token" not-null="true">
+		<type name="character varying" length="0"/>
+		<comment> <![CDATA[Уникальный идентификационный токен, по которому будет определяться пользователь при отправке логов]]> </comment>
+	</column>
+	<constraint name="user_pkey" type="pk-constr" table="public.&quot;user&quot;">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="user_email_key" type="uq-constr" table="public.&quot;user&quot;">
+		<columns names="email" ref-type="src-columns"/>
+	</constraint>
+	<constraint name="user_api_token_key" type="uq-constr" table="public.&quot;user&quot;">
+		<columns names="api_token" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<table name="notification" layers="0" collapse-mode="2" max-obj-count="6" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="480" y="60"/>
+	<column name="user_id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="email">
+		<type name="character varying" length="0"/>
+	</column>
+	<column name="telegram_id">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="vk_domain">
+		<type name="character varying" length="0"/>
+	</column>
+	<column name="website">
+		<type name="character varying" length="0"/>
+	</column>
+	<constraint name="notification_pkey" type="pk-constr" table="public.notification">
+		<columns names="user_id" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<constraint name="notification_user_id_fkey" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;user&quot;" table="public.notification">
+	<columns names="user_id" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_notification_user" type="relfk" layers="0"
+	 custom-color="#9fc542"
+	 src-table="public.notification"
+	 dst-table="public.&quot;user&quot;" reference-fk="notification_user_id_fkey"
+	 src-required="false" dst-required="true"/>
+
+<permission>
+	<object name="public" type="schema"/>
+	<roles names="pg_database_owner"/>
+	<privileges create="true" usage="true"/>
+</permission>
+<permission>
+	<object name="public" type="schema"/>
+	<privileges usage="true"/>
+</permission>
+</dbmodel>

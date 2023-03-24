@@ -5,8 +5,7 @@ from typing import List
 from fastapi import HTTPException, Query, APIRouter, BackgroundTasks, Depends, status
 from fastapi.responses import JSONResponse, Response
 
-from api import config
-from api.schemas import QueryModel, ResponseLogsModel
+from api.schemas import QueryModel
 from api.utils import notifications, get_hash_email
 
 from api.db_utils import get_user_email_by_api_token

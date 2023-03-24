@@ -7,29 +7,32 @@
 <body>
 <div>
     <p>Сервисы уведомлений</p>
-    <form method="post" content="form-data" onsubmit="">
+    <form method="post" content="application/x-www-form-urlencoded" onsubmit="update_services_main(event, this)">
         <label for="email">Почта: </label><input id="email" type="email">
         <label for="telegram_id">Телеграмм</label><input id="telegram_id" type="text">
         <label for="vk_domain">Вк</label><input id="vk_domain" type="text">
         <label for="website">Сайт</label><input id="website" type="text">
+        <input id="button" type="submit">
     </form>
 </div>
 <p id="api_token"></p>
+<button onclick="update_token_main()" type="button">Обновить токен</button>
+<button onclick="reset_password_main()">Поменять пароль</button>
 </body>
 <script>
+    let myHeaders = new Headers();
+    myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'))
     main();
     async function main() {
         await check()
     }
     async function check() {
-        let myHeaders = new Headers();
-        myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
         let response = await fetch(
         'http://{{ host }}:1002/me', {
           method: 'POST',
           headers: myHeaders,
         });
-        if (response.status !== 401){
+        if (response.ok){
             let data = await response.json();
             document.getElementById("email").value = data.email;
             document.getElementById("telegram_id").value = data.telegram_id;
@@ -37,25 +40,93 @@
             document.getElementById("website").value = data.website;
             document.getElementById("api_token").textContent = data.api_token;
         }else{
-            console.log(document.cookie);
             response = await fetch(
                 'http://{{ host }}:1000/refresh', {
                 method: 'POST',
                 headers: {
-                    'cookie': document.cookie
+                    'cookie': document.cookie.substring(14, document.cookie.length)
                 },
                 credentials: "include"
             });
-            if (response.status !== 401){
+            if (response.ok){
                 let data = await response.json();
                 localStorage.setItem("access_token", data.access_token);
                 document.cookie = `refresh_token=${data.refresh_token}; SameSite: Strict; max-age=2592000`;
-                window.location.href = 'http://{{ host }}:1002/me';
+                myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'))
+                response = await fetch(
+                'http://{{ host }}:1002/me', {
+                  method: 'POST',
+                  headers: myHeaders,
+                })
+                data = await response.json();
+                document.getElementById("email").value = data.email;
+                document.getElementById("telegram_id").value = data.telegram_id;
+                document.getElementById("vk_domain").value = data.vk_domain;
+                document.getElementById("website").value = data.website;
+                document.getElementById("api_token").textContent = data.api_token;
             }
             else{
                alert("Вы не авторизовались!");
-               location.href = "http://{{ host }}:1002/log-in";
+               location.href = 'http://{{ host }}:1002/log-in';
             }
+        }
+    }
+
+    function update_services_main(event, form){
+        update_services();
+    }
+
+    async function update_services(){
+        let email = document.getElementById("email").value;
+        let telegram_id = document.getElementById("telegram_id").value;
+        let vk_domain = document.getElementById("vk_domain").value;
+        let website = document.getElementById("website").value;
+        let response = await fetch(
+        'http://{{ host }}:1002/me/update-services', {
+          method: 'POST',
+          headers: myHeaders,
+          body: new URLSearchParams({'email': email, 'telegram_id': telegram_id, "vk_domain": vk_domain, 'website': website})
+        })
+        if (response.ok){
+        }
+        else{
+            alert("Хуй");
+        }
+    }
+
+    function update_token_main(){
+        update_token();
+    }
+    async function update_token(){
+        let response = await fetch(
+        'http://{{ host }}:1002/me/reset-api-token', {
+          method: 'GET',
+          headers: myHeaders,
+        })
+        if (response.ok){
+            let data = await response.json();
+            document.getElementById('api_token').textContent = data.api_token;
+        }
+        else{
+            alert('Ошибка авторизации');
+        }
+    }
+
+    function reset_password_main(){
+        reset_password();
+    }
+
+    async function reset_password(){
+        let response = await fetch(
+        'http://{{ host }}:1002/me/update-password', {
+          method: 'GET',
+          headers: myHeaders,
+        })
+        if (response.ok){
+            alert('Ссылка для обновления пароля отправлена на почту');
+        }
+        else{
+            alert('Ошибка авторизации');
         }
     }
 </script>

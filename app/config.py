@@ -2,7 +2,7 @@ from os import getenv
 from fastapi.templating import Jinja2Templates
 
 
-host = getenv("HOST_IP", "46.19.64.251")
-secret_key = getenv("SECRET_KEY")
-email_password = getenv("EMAIL_PASSWORD")
+HOST_DOMAIN = getenv("HOST_DOMAIN", "localhost")
+SECRET_KEY = getenv("SECRET_KEY")
+EMAIL_PASSWORD = getenv("EMAIL_PASSWORD")
 templates = Jinja2Templates(directory="templates")

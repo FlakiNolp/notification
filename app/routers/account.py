@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Request, Header, BackgroundTasks, Query, Form, status
+from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse, Response, JSONResponse
 from app.utils.aunth import decode_access_token, decode_registration_token
-from app.config import templates, host
+from app.config import templates, HOST_DOMAIN
 from sqlalchemy.orm import Session
 from app.models.database import get_db
 import app.utils.db_utils as db_utils
@@ -13,12 +14,12 @@ router = APIRouter()
 
 @router.get("/log-in")
 async def sign_up(request: Request):
-    return templates.TemplateResponse("log-in.html", context={"request": request})
+    return templates.TemplateResponse("log-in.html", context={"request": request, "host": HOST_DOMAIN})
 
 
 @router.get("/sign-up")
 async def sign_up(request: Request):
-    return templates.TemplateResponse("sign-up.html", context={"request": request})
+    return templates.TemplateResponse("sign-up.html", context={"request": request, "host": HOST_DOMAIN})
 
 
 @router.post("/sign-up")
@@ -26,12 +27,12 @@ async def sign_up(background_tasks: BackgroundTasks, request: Request, form_data
                   db: Session = Depends(get_db)):
     if db_utils.check_email(form_data.username, db):
         background_tasks.add_task(send_token_email, email=form_data.username, password=get_hash(form_data.password))
-        return templates.TemplateResponse("sign-up.html", context={"request": request, "host": host})
+        return templates.TemplateResponse("sign-up.html", context={"request": request, "host": HOST_DOMAIN})
 
 
 @router.get("/me")
 async def my_page(request: Request):
-    return templates.TemplateResponse("personal_cabinet.html", context={"request": request, "host": host})
+    return templates.TemplateResponse("personal_cabinet.html", context={"request": request, "host": HOST_DOMAIN})
 
 
 @router.post("/me")
@@ -47,15 +48,15 @@ async def registration(token: str = Query(),
                        db: Session = Depends(get_db)):
     data = decode_registration_token(token)
     db_utils.new_user(data[0], data[1], db)
-    return RedirectResponse(f"http://{host}:1002/log-in")
+    return RedirectResponse(f"http://{HOST_DOMAIN}:1002/log-in")
 
 
-@router.post("/me/services")
+@router.post("/me/update-services")
 async def services(background_tasks: BackgroundTasks,
-                   email: str = Form(default=None, media_type="form-data"),
-                   telegram_id: int = Form(default=None, media_type="form-data"),
-                   vk_domain: str = Form(default=None, media_type="form-data"),
-                   website: str = Form(default=None, media_type="form-data"),
+                   email: str = Form(default=None, media_type="application/x-www-form-urlencoded"),
+                   telegram_id: str = Form(default=None, media_type="application/x-www-form-urlencoded"),
+                   vk_domain: str = Form(default=None, media_type="application/x-www-form-urlencoded"),
+                   website: str = Form(default=None, media_type="application/x-www-form-urlencoded"),
                    Authorization: str = Header(),
                    db: Session = Depends(get_db)):
     user_id = decode_access_token(Authorization[7:])
@@ -72,7 +73,12 @@ async def post_update_api_token(Authorization: str = Header(),
     return JSONResponse(content={"api_token": api_token}, status_code=status.HTTP_200_OK)
 
 
-@router.get("/me/reset-password")
+@router.get("/reset-password")
+async def reset_password_page(request: Request):
+    return templates.TemplateResponse("reset_password_email", context={"request": request})
+
+
+@router.get("/me/update-password")
 async def update_password(background_tasks: BackgroundTasks,
                           Authorization: str = Header(),
                           db: Session = Depends(get_db)):
@@ -81,16 +87,16 @@ async def update_password(background_tasks: BackgroundTasks,
     return Response(status_code=status.HTTP_200_OK)
 
 
-@router.get("/new-password")
+@router.get("/me/new-password")
 async def new_password(request: Request,
                        token: str = Query()):
     decode_access_token(token)
-    return templates.TemplateResponse("reset_password", context={"request": request, "host": host})
+    return templates.TemplateResponse("reset_password.html", context={"request": request, "host": HOST_DOMAIN})
 
 
-@router.post("/reset-password")
+@router.post("/me/reset-password")
 async def post_reset_password(background_tasks: BackgroundTasks,
-                              password: str = Form(media_type="x-www-form-urlencoded"),
+                              password: str = Form(media_type="application/x-www-form-urlencoded"),
                               Authorization: str = Header(),
                               db: Session = Depends(get_db)):
     user_id = decode_access_token(Authorization[7:])

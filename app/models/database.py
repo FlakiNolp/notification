@@ -4,7 +4,6 @@ from os import getenv
 from sqlalchemy.orm import sessionmaker
 from app.models.users import Base
 
-# TODO Обернуть в класс
 
 db_user = getenv("DB_USER", "postgres")
 db_password = getenv("DB_PASSWORD")

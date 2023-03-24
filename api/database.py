@@ -5,8 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from api.models import Base
 
 
-# TODO Обернуть в класс
-
 db_user = getenv("DB_USER", "postgres")
 db_password = getenv("DB_PASSWORD")
 db_host = getenv("DB_HOST", "localhost")
