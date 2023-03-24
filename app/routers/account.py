@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Request, Header, BackgroundTasks, Query, Form, status
-from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse, Response, JSONResponse
 from app.utils.aunth import decode_access_token, decode_registration_token
@@ -10,6 +9,11 @@ import app.utils.db_utils as db_utils
 from app.utils.utils import send_token_email, get_hash, send_token_update_password
 
 router = APIRouter()
+
+
+@router.get("/")
+async def root(request: Request):
+    return RedirectResponse("http://osetr.space:1002/log-in")
 
 
 @router.get("/log-in")
