@@ -13,18 +13,17 @@ def get_hash(plain: str):
 
 
 def send_mail(recipient, text):
-    sender = 'check.telegram.bot@gmail.com'
-    password = f'{EMAIL_PASSWORD}'
-
-    server = smtplib.SMTP('smtp.gmail.com', 587)
+    sender = 'noreply@osetr.space'
+    server = smtplib.SMTP('smtp.mail.ru', 587)
     server.starttls()
 
     try:
-        server.login(sender, password)
+        server.login(sender, EMAIL_PASSWORD)
         msg = MIMEText(f'{text}')
         msg['Subject'] = 'Error notification'
         server.sendmail(sender, recipient, msg.as_string())
-    except:
+    except Exception as e:
+        print(e)
         return False
 
 

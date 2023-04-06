@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.get("/")
 async def root(request: Request):
-    return RedirectResponse("http://osetr.space:1002/log-in")
+    return templates.TemplateResponse(f"home-page.html", context={"request": request, "host": HOST_DOMAIN})
 
 
 @router.get("/log-in")

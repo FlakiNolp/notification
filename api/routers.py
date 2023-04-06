@@ -61,4 +61,3 @@ async def get_logs(api_token: str, db: Session = Depends(get_db),
             return result
     except FileNotFoundError:
         return HTTPException(status_code=400, detail='You dont have any requests')
-
