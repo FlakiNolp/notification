@@ -52,7 +52,7 @@ async def registration(token: str = Query(),
                        db: Session = Depends(get_db)):
     data = decode_registration_token(token)
     db_utils.new_user(data[0], data[1], db)
-    return RedirectResponse(f"http://{HOST_DOMAIN}:1002/log-in")
+    return RedirectResponse(f"http://{HOST_DOMAIN}/log-in")
 
 
 @router.post("/me/update-services")
