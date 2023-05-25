@@ -10,18 +10,25 @@
       <label>Пароль</label><input id="password" type="password">
       <input type="submit" value="Регистрация">
   </form>
-  <a href="http://{{ host }}:1002/log-in">Войти</a>
+  <a href="http://{{ host }}/log-in">Войти</a>
   <p id="status"></p>
 </body>
 <script>
     function send(e,form) {
-        fetch('http://{{ host }}:1002/sign-up', {method:'post', body: new URLSearchParams({'username': document.getElementById('username').value, 'password': document.getElementById('password').value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+        fetch('http://{{ host }}/sign-up', {method:'post', body: new URLSearchParams({'username': form.username.value, 'password': form.password.value}), headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
             .then((response) => {if (response.ok)
                 return document.getElementById("status").textContent = "Письмо отправлено на почту";
             throw new Error("Такой аккаунт уже существует")})
             .catch((error) => {document.getElementById("status").textContent = error})
         e.preventDefault();
         form.reset();
-}
+    }
+
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'F1'){
+            e.preventDefault();
+            return window.location.href = '/help/registratsiya__vkhod_v_uchyetnuyu_zapis.html';
+        }
+    });
 </script>
 </html>

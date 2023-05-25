@@ -7,7 +7,7 @@
 <body>
 <div>
     <p>Сервисы уведомлений</p>
-    <form method="post" content="application/x-www-form-urlencoded" onsubmit="update_services_main(event, this)">
+    <form method="post" content="application/x-www-form-urlencoded" onsubmit="update_services(event, this)">
         <label for="email">Почта: </label><input id="email" type="email">
         <label for="telegram_id">Телеграмм</label><input id="telegram_id" type="text">
         <label for="vk_domain">Вк</label><input id="vk_domain" type="text">
@@ -16,19 +16,19 @@
     </form>
 </div>
 <p id="api_token"></p>
-<button onclick="update_token_main()" type="button">Обновить токен</button>
-<button onclick="reset_password_main()">Поменять пароль</button>
+<button onclick="update_token()" type="button">Обновить токен</button>
+<button onclick="reset_password()">Поменять пароль</button>
 </body>
 <script>
     let myHeaders = new Headers();
-    myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'))
+    myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
     main();
     async function main() {
         await check()
     }
     async function check() {
         let response = await fetch(
-        'http://{{ host }}:1002/me', {
+        'http://{{ host }}/me', {
           method: 'POST',
           headers: myHeaders,
         });
@@ -40,11 +40,13 @@
             document.getElementById("website").value = data.website;
             document.getElementById("api_token").textContent = data.api_token;
         }else{
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
             response = await fetch(
                 'http://{{ host }}:1000/refresh', {
                 method: 'POST',
                 headers: {
-                    'cookie': document.cookie.substring(14, document.cookie.length)
+                    'cookie': document.cookie.substring(14, ca[0].length)
                 },
                 credentials: "include"
             });
@@ -52,9 +54,9 @@
                 let data = await response.json();
                 localStorage.setItem("access_token", data.access_token);
                 document.cookie = `refresh_token=${data.refresh_token}; SameSite: Strict; max-age=2592000`;
-                myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'))
+                myHeaders.set('Authorization', 'Bearer ' + localStorage.getItem('access_token'));
                 response = await fetch(
-                'http://{{ host }}:1002/me', {
+                'http://{{ host }}/me', {
                   method: 'POST',
                   headers: myHeaders,
                 })
@@ -67,26 +69,18 @@
             }
             else{
                alert("Вы не авторизовались!");
-               location.href = 'http://{{ host }}:1002/log-in';
+               location.href = 'http://{{ host }}/log-in';
             }
         }
     }
 
-    function update_services_main(e, form){
+    async function update_services(e, form){
         e.preventDefault();
-        update_services(form);
-    }
-
-    async function update_services(form){
         let email = form.email.value;
         let telegram_id = form.telegram_id.value;
         let vk_domain = form.vk_domain.value;
         let website = form.website.value;
-        //let email = document.getElementById("email").value;
-        //let telegram_id = document.getElementById("telegram_id").value;
-        //let vk_domain = document.getElementById("vk_domain").value;
-        //let website = document.getElementById("website").value;
-        let response = await fetch('http://{{ host }}:1002/me/update-services', {
+        let response = await fetch('http://{{ host }}/me/update-services', {
           method: 'POST',
           headers: myHeaders,
           body: new URLSearchParams({'email': email, 'telegram_id': telegram_id, "vk_domain": vk_domain, 'website': website})
@@ -99,12 +93,9 @@
         }
     }
 
-    function update_token_main(){
-        update_token();
-    }
     async function update_token(){
         let response = await fetch(
-        'http://{{ host }}:1002/me/reset-api-token', {
+        'http://{{ host }}/me/reset-api-token', {
           method: 'GET',
           headers: myHeaders,
         })
@@ -117,13 +108,9 @@
         }
     }
 
-    function reset_password_main(){
-        reset_password();
-    }
-
     async function reset_password(){
         let response = await fetch(
-        'http://{{ host }}:1002/me/update-password', {
+        'http://{{ host }}/me/update-password', {
           method: 'GET',
           headers: myHeaders,
         })
@@ -134,5 +121,12 @@
             alert('Ошибка авторизации');
         }
     }
+
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'F1'){
+            e.preventDefault();
+            return window.location.href = '/help/nastrojki.html';
+        }
+    });
 </script>
 </html>

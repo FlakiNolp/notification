@@ -15,6 +15,7 @@ services:
     depends_on:
       - db
     build: auth
+    restart: always
     environment:
       PYTHONPATH: /usr/src
       DB_HOST: db
@@ -32,6 +33,7 @@ services:
     depends_on:
       - db
     build: api
+    restart: always
     environment:
       PYTHONPATH: /usr/src
       DB_HOST: db
@@ -51,6 +53,7 @@ services:
     depends_on:
       - db
     build: app
+    restart: always
     environment:
       HOST_DOMAIN: "${HOST_DOMAIN}"
       PYTHONPATH: /usr/src
@@ -61,7 +64,7 @@ services:
       SECRET_KEY: "${SECRET_KEY}"
       EMAIL_PASSWORD: "${EMAIL_PASSWORD}"
     ports:
-      - "1002:1002"
+      - "80:80"
 
 volumes:
   api_logs:

@@ -1,7 +1,6 @@
 import hashlib
-from datetime import timedelta
 from app.config import EMAIL_PASSWORD, HOST_DOMAIN
-from app.utils.aunth import create_token
+from app.utils.auth import create_token
 import smtplib
 from email.mime.text import MIMEText
 from sqlalchemy.orm import Session
@@ -28,19 +27,17 @@ def send_mail(recipient, text):
 
 
 def send_token_email(email, password):
-    expire_delta = timedelta(minutes=10)
-    encoded_jwt = create_token({"email": email, "hashed_password": password}, expire_delta)
-    #text = f"Перейдите по ссылке, чтобы завершить процесс регистрации\n\nhttp://127.0.0.1:1002/registration?email_token={encoded_jwt}\n\nСсылка действительна 10 минут"
-    text = f"http://{HOST_DOMAIN}:1002/registration?token={encoded_jwt}"
+    encoded_jwt = create_token({"email": email, "hashed_password": password}, 10)
+    #text = f"Перейдите по ссылке, чтобы завершить процесс регистрации\n\nhttp://127.0.0.1/registration?email_token={encoded_jwt}\n\nСсылка действительна 10 минут"
+    text = f"http://{HOST_DOMAIN}/registration?token={encoded_jwt}"
     if not send_mail(email, text):
         return False
 
 
 def send_token_update_password(db: Session, user_id: int):
-    expire_delta = timedelta(minutes=10)
-    encoded_jwt = create_token({"id": user_id}, expire_delta)
+    encoded_jwt = create_token({"id": user_id}, 10)
     email = db_utils.get_email_by_id(user_id, db)
-    #text = f"Пройдите по ссылке, чтобы поменять пароль\n\nhttp://127.0.0.1:1002/new_password?email_token={encoded_jwt}\n\nСсылка действительна 10 минут"
-    text = f"http://{HOST_DOMAIN}:1002/me/new-password?token={encoded_jwt}"
+    #text = f"Пройдите по ссылке, чтобы поменять пароль\n\nhttp://127.0.0.1/new_password?email_token={encoded_jwt}\n\nСсылка действительна 10 минут"
+    text = f"http://{HOST_DOMAIN}/me/new-password?token={encoded_jwt}"
     if not send_mail(email, text):
         return False

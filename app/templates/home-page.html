@@ -5,7 +5,15 @@
     <title>Добро пожаловать!</title>
 </head>
 <body>
-  <a href="http://{{ host }}:1002/log-in">Вход</a>
-  <a href="http://{{ host }}:1002/sign-up">Регистрация</a>
+  <a href="http://{{ host }}/log-in">Вход</a>
+  <a href="http://{{ host }}/sign-up">Регистрация</a>
 </body>
+<script>
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'F1'){
+            e.preventDefault();
+            return window.location.href = '/help/_opisanie_operatsij_glavnoj_stranitsy.html';
+        }
+    });
+</script>
 </html>

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.models.users import User, Notification
+from app.database.models import User, Notification
 from fastapi import HTTPException, status
 import time
 from app.utils.utils import get_hash

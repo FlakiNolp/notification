@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Request, Header, BackgroundTasks, Query, Form, status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import RedirectResponse, Response, JSONResponse
-from app.utils.aunth import decode_access_token, decode_registration_token
+from fastapi.responses import RedirectResponse, Response, JSONResponse, FileResponse
+from app.utils.auth import decode_access_token, decode_registration_token
 from app.config import templates, HOST_DOMAIN
 from sqlalchemy.orm import Session
-from app.models.database import get_db
+from app.database.connection import get_db
 import app.utils.db_utils as db_utils
 from app.utils.utils import send_token_email, get_hash, send_token_update_password
 
@@ -17,7 +17,7 @@ async def root(request: Request):
 
 
 @router.get("/log-in")
-async def sign_up(request: Request):
+async def log_in(request: Request):
     return templates.TemplateResponse("log-in.html", context={"request": request, "host": HOST_DOMAIN})
 
 
@@ -103,6 +103,21 @@ async def post_reset_password(background_tasks: BackgroundTasks,
                               password: str = Form(media_type="application/x-www-form-urlencoded"),
                               Authorization: str = Header(),
                               db: Session = Depends(get_db)):
-    user_id = decode_access_token(Authorization[7:])
+    user_id = decode_access_token(Authorization)
     background_tasks.add_task(db_utils.reset_password, db, user_id, password)
     return Response(status_code=status.HTTP_200_OK)
+
+
+@router.get("/help/{path}")
+async def help_path(path: str):
+    return FileResponse(f'/usr/src/app/templates/help/{path}')
+
+
+@router.get("/help/{path}/{filename}")
+async def help_path_filename(path: str, filename: str):
+    return FileResponse(f'/usr/src/app/templates/help/{path}/{filename}')
+
+
+@router.get("/help/{path1}/{path2}/{path3}/{filename}")
+async def help_path_filename(path1: str, path2: str, path3: str, filename: str):
+    return FileResponse(f'/usr/src/app/templates/help/{path1}/{path2}/{path3}/{filename}')

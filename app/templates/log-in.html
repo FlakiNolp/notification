@@ -5,27 +5,23 @@
     <title>Вход</title>
 </head>
 <body>
-  <form method="post" content="application/x-www-form-urlencoded" onsubmit="main(event,this)">
+  <form method="post" content="application/x-www-form-urlencoded" onsubmit="send(event,this)">
       <label>Почта</label><input id="username" type="email">
       <label>Пароль</label><input id="password" type="password">
       <input type="submit" value="Войти">
   </form>
-<a href="http://{{ host }}:1002/sign-up">Зарегистрироваться</a>
+<a href="http://{{ host }}/sign-up">Зарегистрироваться</a>
 <button type="button" onclick="reset_password()">Забыли пароль</button>
 <p id="reset_password"></p>
 </body>
 <script>
-    function main(e, form){
-        send()
+    async function send(e, form) {
         e.preventDefault();
-        form.reset();
-    }
-
-    async function send() {
         let result = await fetch('http://{{ host }}:1000/token', {method:'post',
-            body: new URLSearchParams({'username': document.getElementById('username').value,
-                'password': document.getElementById('password').value}),
+            body: new URLSearchParams({'username': form.username.value,
+                'password': form.password.value}),
             headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
+        form.reset();
         if (result.ok){
             return save_into_storages(await result.json());
         }
@@ -39,5 +35,12 @@
         localStorage.setItem("access_token", data.access_token);
         window.location.href = "/me";
     }
+
+    document.addEventListener('keydown', function(e){
+        if (e.key === 'F1'){
+            e.preventDefault();
+            return window.location.href = '/help/registratsiya__vkhod_v_uchyetnuyu_zapis.html';
+        }
+    });
 </script>
 </html>

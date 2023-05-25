@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from api.main import app
+from api.start_server import app
 import pytest
 from httpx import AsyncClient
 
