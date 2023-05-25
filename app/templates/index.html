@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400&display=swap"
+        rel="stylesheet">
+    <title>Logify</title>
+    <link rel="shortcut icon" href="{{ url_for('static', path='/images/faicon.png') }}" type="image/png">
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header__inner">
+                <div class="header__logo"><img src="{{ url_for('static', path='/images/faicon.png') }}" width="80px" height="80px" /></div>
+
+                <nav class="nav">
+                    <a class="nav__link" href="#">Главная</a>
+                    <a class="nav__link" href="#">Меню</a>
+                    <a class="nav__link" href="#">RU</a>
+                    <button class="header__login" href="#">Начать</button>
+                </nav>
+            </div>
+
+        </div>
+
+    </header>
+
+    <main>
+        <div class="banner">
+            <div class="banner__text">
+                <h1 class="banner__title">Logify</h1>
+                <span class="banner__description">
+                    — Клиент-серверное приложение
+                    позволяющее упростить и автоматизировать алгоритм логгирования, фильтрации и оповещения нужной для
+                    пользователя или компании информации в удобном формате.</span>
+            </div>
+        </div>
+        <img src="{{ url_for('static', path='/images/illustration.png') }}" class="monoblock" alt="" />
+    </main>
+</body>
+</html>

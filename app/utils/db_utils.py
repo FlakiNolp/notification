@@ -46,10 +46,9 @@ def check_email(email: str, db: Session):
 
 def new_user(email: str, hashed_password: str, db: Session):
     try:
-        count = db.query(User).count() + 1
         api_token = str(int((time.time() % 1) * 10000000000000000)) + ":" + str(uuid.uuid4())
-        user = User(id=count, email=email, hashed_password=hashed_password, api_token=api_token)
-        services = Notification(user_id=count, email=email)
+        user = User(email=email, hashed_password=hashed_password, api_token=api_token)
+        services = Notification(email=email)
         db.add_all([user, services])
         db.commit()
     except:

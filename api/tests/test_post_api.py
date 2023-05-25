@@ -1,5 +1,9 @@
 from fastapi.testclient import TestClient
 
+from httpx import AsyncClient
+import pytest
+import asyncio
+
 from sqlalchemy.engine import create_engine
 from sqlalchemy import URL
 from os import getenv
@@ -8,7 +12,7 @@ from sqlalchemy.orm import sessionmaker, Session
 
 from api.database.models import Base, User, Notification
 from api.start_server import app
-from api.database import get_db
+#from api.database import get_db
 from api import config
 
 db_user = getenv("DB_USER", "postgres")
@@ -33,7 +37,7 @@ def override_get_db():
         db.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
+#app.dependency_overrides[get_db] = override_get_db
 client = TestClient(app)
 
 
@@ -44,14 +48,41 @@ def test_api_save_logs(db=override_get_db()):
 
     create_user(db)
 
-    client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
-                json={'code': 100, 'message': 'test_message', 'additional': 'test_additional'})
-    #client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
+    response = client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
+                json={'code': 123, 'message': 'test_message', 'additional': 'test_additional'})
+    # client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
     #            json={'code': 101, 'message': 'test_message'})
-    #client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
+    # client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
     #            json={'code': 102, 'additional': 'test_additional'})
-    #client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
+    # client.post(f"/api?api_token=8802824020385742:d0e7f6bf-07f8-485d-b439-73a9e1ca55eb",
     #            json={'code': 103, 'message': 'test_message', 'additional': 'test_additional'})
+
+
+@pytest.mark.anyio
+async def test_spam():
+    async with AsyncClient(app=app, base_url="http://localhost") as ac:
+        async with asyncio.TaskGroup() as tg:
+            for i in range(100):
+                if i % 3 == 3:
+                    response = await tg.create_task(
+                        get_post_response(ac, "/api?api_token=5282769203186035:8c4ad0e8-e9f2-454d-a3d7-9609da136ac4",
+                                          json={'code': 124, 'message': 'test_message',
+                                                'additional': 'test_additional'}))
+                elif i % 3 == 2:
+                    response = await tg.create_task(
+                        get_post_response(ac, "/api?api_token=3434715270996094:7b3d02c9-6eb9-4baf-884d-2aefe1969227",
+                                          json={'code': 124, 'message': 'test_message',
+                                                'additional': 'test_additional'}))
+                else:
+                    response = await tg.create_task(
+                        get_post_response(ac, "/api?api_token=7609896659851074:9edebb4e-3e0f-49a4-8ee7-a6c5827f0d35",
+                                          json={'code': 124, 'message': 'test_message',
+                                                'additional': 'test_additional'}))
+    assert response.status_code == 201
+
+
+async def get_post_response(ac: AsyncClient(), url: str, json: dict):
+    return await ac.post(url, json=json)
 
 
 def create_user(db: Session):

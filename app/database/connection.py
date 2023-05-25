@@ -1,9 +1,10 @@
 from sqlalchemy.engine import create_engine
 from sqlalchemy import URL
-from os import getenv
 from sqlalchemy.orm import sessionmaker
-from app.database.models import Base
 
+from os import getenv
+
+from app.database.models import Base
 
 db_user = getenv("DB_USER", "postgres")
 db_password = getenv("DB_PASSWORD")

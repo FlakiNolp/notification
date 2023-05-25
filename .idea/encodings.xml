@@ -3,6 +3,15 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/api" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/static/css/style.css" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/dssv.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/faicon.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/headerbackground.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/homepage1.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/illustration.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/ru.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/static/images/welcomepage.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/app/templates/index.html" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/utils/utils.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/auth" charset="UTF-8" />
     <file url="PROJECT" charset="windows-1251" />
