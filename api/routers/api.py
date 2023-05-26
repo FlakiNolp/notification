@@ -9,15 +9,19 @@ from api.schemas import QueryModel
 from api.utils.utils import notifications, get_hash_email
 
 from api.utils.db_utils import get_user_email_by_api_token
-from api.database.connection import get_db
+from api.database.connection import DataBase
 
 from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+database = DataBase()
+database._create_schema()
+
 
 @router.post("/api")
-async def post_log(query: QueryModel, api_token: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+async def post_log(query: QueryModel, api_token: str, background_tasks: BackgroundTasks,
+                   db: Session = Depends(database._get_db)):
     user = get_user_email_by_api_token(api_token=api_token, db=db)
     response = query.dict()
     background_tasks.add_task(notifications, user, response)
@@ -25,7 +29,7 @@ async def post_log(query: QueryModel, api_token: str, background_tasks: Backgrou
 
 
 @router.get('/api/logs')
-async def get_logs(api_token: str, db: Session = Depends(get_db),
+async def get_logs(api_token: str, db: Session = Depends(database._get_db),
                    code: List[int] = Query([int(i) for i in range(100, 527)], ge=100, le=526),
                    time_from: datetime = datetime(year=1, month=1, day=1),
                    time_to: datetime = datetime(year=9999, month=12, day=31),

@@ -2,7 +2,7 @@ from fastapi import Depends, HTTPException, status, APIRouter, Cookie
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
-from auth.database.connection import get_db
+from auth.database.connection import DataBase
 from sqlalchemy.orm import Session
 from auth.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_HOURS
 import auth.utils.auth as auth_utils
@@ -11,9 +11,13 @@ router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
+database = DataBase()
+database._create_schema()
+
 
 @router.post("/token")
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
+                                 db: Session = Depends(database._get_db)):
     user = auth_utils.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(

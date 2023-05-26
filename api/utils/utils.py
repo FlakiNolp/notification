@@ -79,12 +79,12 @@ async def send_website(recipient: str, text: str):
 async def notifications(user, response: dict):
     text = f'''Это автоматически сгеннерированное сообщение уведомление:\n\ncode: {response['code']}\nmessage: {response['message']}\nadditional: {response['additional']}'''
     async with asyncio.TaskGroup() as tg:
-        task1 = tg.create_task(save_logs(response=response, source=get_hash_email(user.email)))
+        tg.create_task(save_logs(response=response, source=get_hash_email(user.email)))
         if user.services.email is not None:
-            task2 = tg.create_task(send_mail(recipient=user.services.email, text=text))
+            tg.create_task(send_mail(recipient=user.services.email, text=text))
         if user.services.telegram_id is not None:
-            task3 = tg.create_task(send_telegram(recipient=user.services.telegram_id, text=text))
+            tg.create_task(send_telegram(recipient=user.services.telegram_id, text=text))
         if user.services.vk_domain is not None:
-            task4 = tg.create_task(send_vk(recipient=user.services.vk_domain, text=text))
+            tg.create_task(send_vk(recipient=user.services.vk_domain, text=text))
         if user.services.website is not None:
-            task5 = tg.create_task(send_website(recipient=user.services.website, text=text))
+            tg.create_task(send_website(recipient=user.services.website, text=text))

@@ -28,8 +28,9 @@ def send_mail(recipient, text):
 
 def send_token_email(email, password):
     encoded_jwt = create_token({"email": email, "hashed_password": password}, 10)
-    #text = f"Перейдите по ссылке, чтобы завершить процесс регистрации\n\nhttp://127.0.0.1/registration?email_token={encoded_jwt}\n\nСсылка действительна 10 минут"
-    text = f"http://{HOST_DOMAIN}/registration?token={encoded_jwt}"
+    text = f"РџРµСЂРµР№РґРёС‚Рµ РїРѕ СЃСЃС‹Р»РєРµ, С‡С‚РѕР±С‹ Р·Р°РІРµСЂС€РёС‚СЊ РїСЂРѕС†РµСЃСЃ СЂРµРіРёСЃС‚СЂР°С†РёРё\n\nhttp://{HOST_DOMAIN}/registration?token=" \
+           f"{encoded_jwt}\n\nРЎСЃС‹Р»РєР° РґРµР№СЃС‚РІРёС‚РµР»СЊРЅР° 10 РјРёРЅСѓС‚"
+    #text = f"http://{HOST_DOMAIN}/registration?token={encoded_jwt}"
     if not send_mail(email, text):
         return False
 
@@ -37,7 +38,8 @@ def send_token_email(email, password):
 def send_token_update_password(db: Session, user_id: int):
     encoded_jwt = create_token({"id": user_id}, 10)
     email = db_utils.get_email_by_id(user_id, db)
-    #text = f"Пройдите по ссылке, чтобы поменять пароль\n\nhttp://127.0.0.1/new_password?email_token={encoded_jwt}\n\nСсылка действительна 10 минут"
-    text = f"http://{HOST_DOMAIN}/me/new-password?token={encoded_jwt}"
+    text = f"РџСЂРѕР№РґРёС‚Рµ РїРѕ СЃСЃС‹Р»РєРµ, С‡С‚РѕР±С‹ РїРѕРјРµРЅСЏС‚СЊ РїР°СЂРѕР»СЊ\n\nhttp://{HOST_DOMAIN}/me/new-password?token={encoded_jwt}" \
+           f"\n\nРЎСЃС‹Р»РєР° РґРµР№СЃС‚РІРёС‚РµР»СЊРЅР° 10 РјРёРЅСѓС‚"
+    #text = f"http://{HOST_DOMAIN}/me/new-password?token={encoded_jwt}"
     if not send_mail(email, text):
         return False

@@ -5,23 +5,21 @@ from sqlalchemy.orm import sessionmaker
 from auth.database.models import Base
 
 
-db_user = getenv("DB_USER", "postgres")
-db_password = getenv("DB_PASSWORD")
-db_host = getenv("DB_HOST", "localhost")
-db_port = getenv("DB_PORT", 6543)
+class DataBase:
+    def __init__(self, db_user=getenv("DB_USER", "postgres"), db_password=getenv("DB_PASSWORD", "postgres"),
+                 db_host=getenv("DB_HOST", "localhost"), db_port=getenv("DB_PORT", 6543)):
+        self._url = URL.create(drivername="postgresql+psycopg2", username=db_user, password=db_password, host=db_host,
+                               port=db_port,
+                               database="users")
+        self._engine = create_engine(self._url)
+        self._SessionLocal = sessionmaker(self._engine)
 
-url = URL.create(drivername="postgresql+psycopg2", username=db_user, password=db_password, host=db_host, port=db_port,
-                 database="users")
+    def _create_schema(self):
+        Base.metadata.create_all(self._engine)
 
-engine = create_engine(url)
-
-Base.metadata.create_all(engine)
-SessionLocal = sessionmaker(engine)
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    def _get_db(self):
+        db = self._SessionLocal()
+        try:
+            yield db
+        finally:
+            db.close()

@@ -48,8 +48,8 @@ def new_user(email: str, hashed_password: str, db: Session):
     try:
         api_token = str(int((time.time() % 1) * 10000000000000000)) + ":" + str(uuid.uuid4())
         user = User(email=email, hashed_password=hashed_password, api_token=api_token)
-        services = Notification(email=email)
-        db.add_all([user, services])
+        user.services = Notification(email=email)
+        db.add(user)
         db.commit()
     except:
         raise HTTPException(
