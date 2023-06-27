@@ -26,7 +26,7 @@ async def save_logs(response, source):
             logs_list.append(response)
         with open(f'''logs/{source}.json''', 'w+') as f:
             json.dump(logs_dict, f, ensure_ascii=False)
-    except:
+    except FileNotFoundError:
         logs_dict = {'logs': [response]}
         with open(f'''logs/{source}.json''', 'x') as f:
             json.dump(logs_dict, f, ensure_ascii=False)
@@ -64,7 +64,7 @@ async def send_vk(recipient, text):
         random_id = str(
             int.from_bytes(bytes=(recipient + config.VK_API_KEY).encode('utf-8'), byteorder='big'))[
                     random_int: random_int + 9]
-        response = requests.get(f'''https://api.vk.com/method/messages.send?domain={recipient}&random_id={random_id}&message={text}&access_token={config.VK_API_KEY}&v=5.131''')
+        requests.get(f'''https://api.vk.com/method/messages.send?domain={recipient}&random_id={random_id}&message={text}&access_token={config.VK_API_KEY}&v=5.131''')
     except Exception as ex:
         print(f'''Не получилось отправить сообщение {recipient}\n{ex}''')
 

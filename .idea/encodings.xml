@@ -14,6 +14,10 @@
     <file url="file://$PROJECT_DIR$/app/templates/index.html" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/app/utils/utils.py" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/auth" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tests/context_manager_class.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tests/test_api/logs" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tests/test_api/test_endpoints.py" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tests/test_api/test_post_api.py" charset="UTF-8" />
     <file url="PROJECT" charset="windows-1251" />
   </component>
 </project>

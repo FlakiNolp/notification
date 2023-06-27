@@ -18,8 +18,7 @@ class User(Base):
 class Notification(Base):
     __tablename__ = "notification"
     __table_args__ = {"schema": "public"}
-    id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey(User.id))
+    user_id: Mapped[int] = mapped_column(ForeignKey(User.id, ondelete='cascade'), primary_key=True)
     email: Mapped[str] = mapped_column(nullable=True)
     telegram_id: Mapped[int] = mapped_column(nullable=True)
     vk_domain: Mapped[str] = mapped_column(nullable=True)

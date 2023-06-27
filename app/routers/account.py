@@ -4,18 +4,19 @@ from fastapi.responses import RedirectResponse, Response, JSONResponse, FileResp
 from app.utils.auth import decode_access_token, decode_registration_token
 from app.config import templates, HOST_DOMAIN
 from sqlalchemy.orm import Session
-from app.database.connection import DataBase
+from app.database.DataBase import DataBase
 import app.utils.db_utils as db_utils
 from app.utils.utils import send_token_email, get_hash, send_token_update_password
+from app.database.models import Base
 
 router = APIRouter()
 
 database = DataBase()
-database._create_schema()
+database.create_schema(Base)
 
 
 @router.get("/")
-async def root(request: Request):
+async def main(request: Request):
     return templates.TemplateResponse(f"home-page.html", context={"request": request, "host": HOST_DOMAIN})
 
 
@@ -30,11 +31,11 @@ async def sign_up(request: Request):
 
 
 @router.post("/sign-up")
-async def sign_up(background_tasks: BackgroundTasks, request: Request, form_data: OAuth2PasswordRequestForm = Depends(),
-                  db: Session = Depends(database._get_db)):
+async def sign_up(background_tasks: BackgroundTasks, form_data: OAuth2PasswordRequestForm = Depends(),
+                  db: Session = Depends(database.get_db)):
     if db_utils.check_email(form_data.username, db):
         background_tasks.add_task(send_token_email, email=form_data.username, password=get_hash(form_data.password))
-        return templates.TemplateResponse("sign-up.html", context={"request": request, "host": HOST_DOMAIN})
+        return Response(status_code=200)
 
 
 @router.get("/me")
@@ -44,7 +45,7 @@ async def my_page(request: Request):
 
 @router.post("/me")
 async def my_page(Authorization: str = Header(),
-                  db: Session = Depends(database._get_db)):
+                  db: Session = Depends(database.get_db)):
     id = decode_access_token(Authorization[7:])
     user = db_utils.get_services_by_id(id, db)
     return user
@@ -52,7 +53,7 @@ async def my_page(Authorization: str = Header(),
 
 @router.get("/registration")
 async def registration(token: str = Query(),
-                       db: Session = Depends(database._get_db)):
+                       db: Session = Depends(database.get_db)):
     data = decode_registration_token(token)
     db_utils.new_user(data[0], data[1], db)
     return RedirectResponse(f"http://{HOST_DOMAIN}/log-in")
@@ -65,7 +66,7 @@ async def services(background_tasks: BackgroundTasks,
                    vk_domain: str = Form(default=None, media_type="application/x-www-form-urlencoded"),
                    website: str = Form(default=None, media_type="application/x-www-form-urlencoded"),
                    Authorization: str = Header(),
-                   db: Session = Depends(database._get_db)):
+                   db: Session = Depends(database.get_db)):
     user_id = decode_access_token(Authorization[7:])
     if user_id:
         background_tasks.add_task(db_utils.edit_services, db, user_id, email, telegram_id, vk_domain, website)
@@ -74,7 +75,7 @@ async def services(background_tasks: BackgroundTasks,
 
 @router.get("/me/reset-api-token")
 async def post_update_api_token(Authorization: str = Header(),
-                                db: Session = Depends(database._get_db)):
+                                db: Session = Depends(database.get_db)):
     user_id = decode_access_token(Authorization[7:])
     api_token = db_utils.update_api_token(db, user_id)
     return JSONResponse(content={"api_token": api_token}, status_code=status.HTTP_200_OK)
@@ -88,7 +89,7 @@ async def reset_password_page(request: Request):
 @router.get("/me/update-password")
 async def update_password(background_tasks: BackgroundTasks,
                           Authorization: str = Header(),
-                          db: Session = Depends(database._get_db)):
+                          db: Session = Depends(database.get_db)):
     user_id = decode_access_token(Authorization[7:])
     background_tasks.add_task(send_token_update_password, db, user_id)
     return Response(status_code=status.HTTP_200_OK)
@@ -105,7 +106,7 @@ async def new_password(request: Request,
 async def post_reset_password(background_tasks: BackgroundTasks,
                               password: str = Form(media_type="application/x-www-form-urlencoded"),
                               Authorization: str = Header(),
-                              db: Session = Depends(database._get_db)):
+                              db: Session = Depends(database.get_db)):
     user_id = decode_access_token(Authorization)
     background_tasks.add_task(db_utils.reset_password, db, user_id, password)
     return Response(status_code=status.HTTP_200_OK)

@@ -2,22 +2,23 @@ from fastapi import Depends, HTTPException, status, APIRouter, Cookie
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import timedelta
-from auth.database.connection import DataBase
+from auth.database.DataBase import DataBase
 from sqlalchemy.orm import Session
 from auth.config import ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_HOURS
 import auth.utils.auth as auth_utils
+from auth.database.models import Base
 
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 database = DataBase()
-database._create_schema()
+database.create_schema(Base)
 
 
 @router.post("/token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(),
-                                 db: Session = Depends(database._get_db)):
+                                 db: Session = Depends(database.get_db)):
     user = auth_utils.authenticate_user(form_data.username, form_data.password, db)
     if not user:
         raise HTTPException(
@@ -34,7 +35,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     refresh_token = auth_utils.create_token(
         data={"id": user.id}, expires_delta=refresh_token_expires
     )
-    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
+    return JSONResponse(status_code=200, content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
 
 
 # Create refresh token endpoint
@@ -49,4 +50,4 @@ async def refresh_token_fun(refresh_token: str = Cookie()):
     refresh_token = auth_utils.create_token(
         data={"id": id}, expires_delta=refresh_token_expires
     )
-    return JSONResponse(content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
+    return JSONResponse(status_code=200, content={"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"})
